@@ -1,9 +1,16 @@
 {
-  "name": "Live Solutions Remote",
-  "short_name": "LiveSol",
+  "name": "Remote Support Pro",
+  "short_name": "Support",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0a192f",
-  "theme_color": "#0a192f",
-  "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/2092/2092663.png", "sizes": "512x512", "type": "image/png"}]
+  "background_color": "#020817",
+  "theme_color": "#020817",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067451.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
