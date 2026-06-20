@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Solutions Remote</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { background: #0a192f; color: white; text-align: center; font-family: sans-serif; padding: 20px; }
+        .btn { background: #00adb5; border: none; padding: 15px; color: white; width: 100%; border-radius: 10px; margin-top: 20px; font-weight: bold; cursor: pointer; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #172a45; color: white; border: 1px solid #00adb5; border-radius: 5px; }
+        #remoteVideo { width: 100%; border-radius: 10px; margin-top: 20px; display: none; border: 2px solid #00adb5; }
+        h1 { color: #00adb5; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>LIVE SOLUTIONS</h1>
+    <p style="color: #a8b2d1;">Remote Support Portal</p>
+    <input type="text" id="code" placeholder="Enter Session ID (e.g. 1234)">
+    <button class="btn" onclick="startSupport()">ADMIN: VIEW SCREEN</button>
+    <button class="btn" style="background:#30475e" onclick="joinSupport()">CLIENT: SHARE SCREEN</button>
+    <video id="remoteVideo" autoplay playsinline></video>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBs-beXO4RTWL_DVR2zhmlx51S_JVb8w60",
+            authDomain: "live-supported-solution.firebaseapp.com",
+            databaseURL: "https://live-supported-solution-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "live-supported-solution",
+            appId: "1:753592746095:web:6517a9657022d46e309995"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let pc = new RTCPeerConnection({iceServers: [{urls: 'stun:stun.l.google.com:19302'}]});
+
+        async function startSupport() {
+            const id = document.getElementById('code').value;
+            if(!id) return alert("Enter Code");
+            pc.ontrack = e => { 
+                const v = document.getElementById('remoteVideo');
+                v.srcObject = e.streams[0]; 
+                v.style.display='block'; 
+            };
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            db.ref('sessions/'+id).set({offer});
+            db.ref('sessions/'+id+'/answer').on('value', async s => { 
+                if(s.val() && !pc.currentRemoteDescription) await pc.setRemoteDescription(new RTCSessionDescription(s.val())); 
+            });
+        }
+
+        async function joinSupport() {
+            const id = document.getElementById('code').value;
+            if(!id) return alert("Enter Code");
+            const stream = await navigator.mediaDevices.getDisplayMedia({video:true});
+            stream.getTracks().forEach(t => pc.addTrack(t, stream));
+            const snap = await db.ref('sessions/'+id+'/offer').once('value');
+            await pc.setRemoteDescription(new RTCSessionDescription(snap.val()));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            db.ref('sessions/'+id).update({answer});
+        }
+    </script>
+</body>
+</html>
+
