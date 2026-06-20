@@ -4,222 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Remote Support Pro | Live Solutions</title>
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#020817">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
     <style>
-        :root {
-            --neon: #00d2ff;
-            --primary: #0072ff;
-            --bg: #020817;
-            --glass: rgba(15, 23, 42, 0.8);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
-
-        body {
-            background: var(--bg);
-            background-image: 
-                radial-gradient(circle at 50% -20%, #0072ff33 0%, transparent 50%),
-                radial-gradient(circle at 0% 100%, #00d2ff11 0%, transparent 40%);
-            color: #f8fafc;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-        }
-
-        /* Top Navigation */
-        nav {
-            width: 100%;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(2, 8, 23, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            position: sticky;
-            top: 0; z-index: 100;
-        }
-
-        .logo { font-weight: 900; letter-spacing: 2px; color: var(--neon); text-shadow: 0 0 10px var(--primary); }
-        
-        .sys-status {
-            display: flex; align-items: center; gap: 8px; font-size: 0.65rem;
-            background: rgba(0, 210, 255, 0.1); padding: 5px 12px; border-radius: 50px;
-            border: 1px solid rgba(0, 210, 255, 0.2); color: var(--neon);
-        }
-        .dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e; }
-
-        /* Main Container */
-        main {
-            flex: 1;
-            width: 100%;
-            max-width: 440px;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .hero-card {
-            background: var(--glass);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 35px;
-            padding: 40px 30px;
-            text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--neon));
-        }
-
-        .icon-shield {
-            width: 90px; height: 90px;
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border-radius: 24px;
-            margin: 0 auto 25px;
-            display: flex; align-items: center; justify-content: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-        .icon-shield svg { width: 45px; fill: var(--neon); filter: drop-shadow(0 0 8px var(--primary)); }
-
-        h2 { font-size: 1.6rem; margin-bottom: 10px; font-weight: 800; }
-        .desc { color: #94a3b8; font-size: 0.9rem; margin-bottom: 30px; }
-
-        /* Professional Input */
-        .input-group { position: relative; margin-bottom: 25px; }
-        input {
-            width: 100%;
-            padding: 20px;
-            background: #020617;
-            border: 1px solid #1e293b;
-            border-radius: 20px;
-            color: #fff;
-            text-align: center;
-            font-size: 1.4rem;
-            font-weight: 700;
-            letter-spacing: 5px;
-            transition: all 0.3s;
-        }
-        input:focus {
-            border-color: var(--neon);
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.15);
-            outline: none;
-        }
-
-        /* Buttons */
-        .btn {
-            width: 100%;
-            padding: 18px;
-            border-radius: 20px;
-            border: none;
-            font-weight: 800;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            margin-bottom: 15px;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--neon));
-            color: #020817;
-            box-shadow: 0 10px 25px -5px rgba(0, 114, 255, 0.4);
-        }
-        .btn-secondary {
-            background: rgba(255,255,255,0.03);
-            color: #f8fafc;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .btn:hover { transform: translateY(-3px); }
-        .btn:active { transform: translateY(0) scale(0.97); }
-
-        #remoteVideo {
-            width: 100%;
-            border-radius: 25px;
-            margin-top: 20px;
-            display: none;
-            border: 1px solid var(--neon);
-            box-shadow: 0 0 40px rgba(0, 210, 255, 0.2);
-            background: #000;
-        }
-
-        footer {
-            width: 100%;
-            padding: 40px;
-            text-align: center;
-            font-size: 0.75rem;
-            color: #475569;
-            font-weight: 600;
-            letter-spacing: 2px;
-        }
-
-        /* PWA Install Button */
-        #installApp {
-            position: fixed; bottom: 30px; 
-            background: #fff; color: #020817;
-            padding: 12px 24px; border-radius: 50px;
-            font-weight: 900; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: none; z-index: 1000; cursor: pointer;
-            animation: slideUp 0.5s ease-out;
-        }
-        @keyframes slideUp { from { bottom: -50px; } to { bottom: 30px; } }
+        :root { --neon: #00d2ff; --bg: #020817; --glass: rgba(15, 23, 42, 0.9); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+        header { width: 100%; padding: 25px; text-align: center; border-bottom: 1px solid rgba(0, 210, 255, 0.2); background: rgba(0,0,0,0.3); }
+        header h1 { color: var(--neon); letter-spacing: 4px; font-size: 1.5rem; text-shadow: 0 0 15px var(--neon); text-transform: uppercase; }
+        main { flex: 1; width: 100%; max-width: 420px; padding: 30px 20px; }
+        .card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; padding: 35px; box-shadow: 0 25px 50px rgba(0,0,0,0.8); text-align: center; }
+        .icon { width: 80px; height: 80px; background: #0f172a; border-radius: 25px; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neon); box-shadow: 0 0 20px rgba(0, 210, 255, 0.2); }
+        input { width: 100%; padding: 18px; background: #000; border: 1px solid #1e293b; border-radius: 18px; color: #fff; text-align: center; font-size: 1.3rem; margin-bottom: 25px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
+        .btn { width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; margin-bottom: 12px; transition: 0.3s; }
+        .btn-view { background: linear-gradient(135deg, #0072ff, #00d2ff); color: #020817; box-shadow: 0 10px 20px rgba(0, 114, 255, 0.3); }
+        .btn-share { background: #1e293b; color: #f8fafc; border: 1px solid rgba(255,255,255,0.1); }
+        #remoteVideo { width: 100%; border-radius: 25px; margin-top: 20px; display: none; border: 2px solid var(--neon); box-shadow: 0 0 30px rgba(0, 210, 255, 0.4); }
+        footer { width: 100%; padding: 30px; text-align: center; font-size: 0.75rem; color: #475569; letter-spacing: 2px; font-weight: bold; border-top: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
-
-    <nav>
-        <div class="logo">LIVE SOLUTIONS</div>
-        <div class="sys-status">
-            <div class="dot"></div> PRO CLOUD ACTIVE
-        </div>
-    </nav>
-
+    <header><h1>LIVE SOLUTIONS</h1></header>
     <main>
-        <div class="hero-card">
-            <div class="icon-shield">
-                <svg viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,13C14.67,13 20,14.33 20,17V18H4V17C4,14.33 9.33,13 12,13Z"/></svg>
-            </div>
+        <div class="card">
+            <div class="icon"><svg width="40" fill="#00d2ff" viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,13C14.67,13 20,14.33 20,17V18H4V17C4,14.33 9.33,13 12,13Z"/></svg></div>
             <h2>Remote Support</h2>
-            <p class="desc">Encrypted End-to-End Visual Diagnostics</p>
-            
-            <div class="input-group">
-                <input type="text" id="code" placeholder="0000" maxlength="4">
-            </div>
-            
-            <button class="btn btn-primary" onclick="startSupport()">
-                VIEW REMOTE DEVICE
-            </button>
-            <button class="btn btn-secondary" onclick="joinSupport()">
-                SHARE THIS DEVICE
-            </button>
-
+            <p style="color:#64748b; font-size: 0.85rem; margin-bottom: 25px;">Professional Encrypted Support Node</p>
+            <input type="text" id="code" placeholder="ENTER CODE" maxlength="4">
+            <button class="btn btn-view" onclick="startSupport()">VIEW REMOTE DEVICE</button>
+            <button class="btn btn-share" onclick="joinSupport()">SHARE THIS DEVICE</button>
             <video id="remoteVideo" autoplay playsinline></video>
         </div>
     </main>
-
-    <div id="installApp" onclick="doInstall()">INSTALL DESKTOP APP</div>
-
-    <footer>
-        COPYRIGHT © 2026 CREATED BY KAMRAN KHAN
-    </footer>
-
+    <footer>COPYRIGHT © 2026 CREATED BY KAMRAN KHAN</footer>
     <script>
-        // --- PRO FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyBs-beXO4RTWL_DVR2zhmlx51S_JVb8w60",
             authDomain: "live-supported-solution.firebaseapp.com",
@@ -229,80 +50,39 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
-        // High-compatibility ICE Servers
-        const pcConfig = { 
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' }
-            ] 
-        };
-        let pc = new RTCPeerConnection(pcConfig);
-
+        let pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+        
         async function startSupport() {
             const id = document.getElementById('code').value;
             if(!id) return alert("Enter Code");
-            
             pc.ontrack = e => { 
                 const v = document.getElementById('remoteVideo');
-                v.srcObject = e.streams[0]; 
-                v.style.display='block'; 
+                v.srcObject = e.streams[0]; v.style.display='block'; 
             };
-
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
             db.ref('sessions/'+id).set({ offer });
-
             db.ref('sessions/'+id+'/answer').on('value', async s => { 
-                if(s.val() && !pc.currentRemoteDescription) {
-                    await pc.setRemoteDescription(new RTCSessionDescription(s.val()));
-                }
+                if(s.val() && !pc.currentRemoteDescription) await pc.setRemoteDescription(new RTCSessionDescription(s.val())); 
             });
         }
 
         async function joinSupport() {
             const id = document.getElementById('code').value;
             if(!id) return alert("Enter Code");
-
-            // CHECK DEVICE COMPATIBILITY
             if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-                alert("NOTICE: Standard Mobile Browsers block screen sharing for privacy. Please use a PC/Laptop to share your screen, or use the camera instead.");
-                return;
+                return alert("ERROR: Your mobile browser blocks Screen Sharing. Use a Laptop to share screen.");
             }
-
             try {
                 const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
                 stream.getTracks().forEach(t => pc.addTrack(t, stream));
-                
                 const snap = await db.ref('sessions/'+id+'/offer').once('value');
-                if(!snap.val()) return alert("Waiting for Admin connection...");
-
                 await pc.setRemoteDescription(new RTCSessionDescription(snap.val()));
                 const answer = await pc.createAnswer();
                 await pc.setLocalDescription(answer);
                 db.ref('sessions/'+id).update({ answer });
-            } catch(e) {
-                alert("Permission Denied: Ensure you are on a Laptop or a Mobile Browser that supports Screen Capture.");
-            }
+            } catch(e) { alert("Permission Denied."); }
         }
-
-        // --- PWA LOGIC ---
-        let promptEvt;
-        window.addEventListener('beforeinstallprompt', e => {
-            e.preventDefault();
-            promptEvt = e;
-            document.getElementById('installApp').style.display = 'block';
-        });
-
-        function doInstall() {
-            if(promptEvt) {
-                promptEvt.prompt();
-                document.getElementById('installApp').style.display = 'none';
-            }
-        }
-
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
     </script>
 </body>
 </html>
