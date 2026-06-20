@@ -3,36 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Remote Support Pro | Live Solutions</title>
+    <title>Remote Support | Live Solutions</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#020817">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root { --neon: #00d2ff; --bg: #020817; --glass: rgba(15, 23, 42, 0.9); }
+        :root { --neon: #00d2ff; --bg: #020817; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--bg); color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
-        header { width: 100%; padding: 25px; text-align: center; border-bottom: 1px solid rgba(0, 210, 255, 0.2); background: rgba(0,0,0,0.3); }
-        header h1 { color: var(--neon); letter-spacing: 4px; font-size: 1.5rem; text-shadow: 0 0 15px var(--neon); text-transform: uppercase; }
+        header { width: 100%; padding: 25px; text-align: center; border-bottom: 1px solid var(--neon); background: rgba(0,0,0,0.5); }
+        header h1 { color: var(--neon); text-shadow: 0 0 15px var(--neon); letter-spacing: 3px; font-size: 1.5rem; }
         main { flex: 1; width: 100%; max-width: 420px; padding: 30px 20px; }
-        .card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; padding: 35px; box-shadow: 0 25px 50px rgba(0,0,0,0.8); text-align: center; }
-        .icon { width: 80px; height: 80px; background: #0f172a; border-radius: 25px; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neon); box-shadow: 0 0 20px rgba(0, 210, 255, 0.2); }
-        input { width: 100%; padding: 18px; background: #000; border: 1px solid #1e293b; border-radius: 18px; color: #fff; text-align: center; font-size: 1.3rem; margin-bottom: 25px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
+        .card { background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; padding: 35px; box-shadow: 0 25px 50px rgba(0,0,0,0.8); text-align: center; }
+        .status { font-size: 0.7rem; color: #22c55e; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        input { width: 100%; padding: 18px; background: #000; border: 1px solid #1e293b; border-radius: 18px; color: #fff; text-align: center; font-size: 1.3rem; margin-bottom: 25px; outline: none; }
+        input:focus { border-color: var(--neon); box-shadow: 0 0 15px var(--neon); }
         .btn { width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; margin-bottom: 12px; transition: 0.3s; }
         .btn-view { background: linear-gradient(135deg, #0072ff, #00d2ff); color: #020817; box-shadow: 0 10px 20px rgba(0, 114, 255, 0.3); }
-        .btn-share { background: #1e293b; color: #f8fafc; border: 1px solid rgba(255,255,255,0.1); }
-        #remoteVideo { width: 100%; border-radius: 25px; margin-top: 20px; display: none; border: 2px solid var(--neon); box-shadow: 0 0 30px rgba(0, 210, 255, 0.4); }
-        footer { width: 100%; padding: 30px; text-align: center; font-size: 0.75rem; color: #475569; letter-spacing: 2px; font-weight: bold; border-top: 1px solid rgba(255,255,255,0.05); }
+        .btn-share { background: #1e293b; color: #f8fafc; border: 1px solid var(--neon); }
+        #remoteVideo { width: 100%; border-radius: 25px; margin-top: 20px; display: none; border: 2px solid var(--neon); box-shadow: 0 0 30px var(--neon); }
+        footer { width: 100%; padding: 30px; text-align: center; font-size: 0.75rem; color: #475569; letter-spacing: 2px; font-weight: bold; }
     </style>
 </head>
 <body>
     <header><h1>LIVE SOLUTIONS</h1></header>
     <main>
         <div class="card">
-            <div class="icon"><svg width="40" fill="#00d2ff" viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,13C14.67,13 20,14.33 20,17V18H4V17C4,14.33 9.33,13 12,13Z"/></svg></div>
-            <h2>Remote Support</h2>
-            <p style="color:#64748b; font-size: 0.85rem; margin-bottom: 25px;">Professional Encrypted Support Node</p>
+            <div class="status" id="stat">● System Ready</div>
             <input type="text" id="code" placeholder="ENTER CODE" maxlength="4">
             <button class="btn btn-view" onclick="startSupport()">VIEW REMOTE DEVICE</button>
             <button class="btn btn-share" onclick="joinSupport()">SHARE THIS DEVICE</button>
@@ -50,38 +48,50 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-        
+        let pc;
+
+        function setStat(m) { document.getElementById('stat').innerText = "● " + m; }
+
+        function initPC() {
+            pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+            pc.ontrack = e => {
+                const v = document.getElementById('remoteVideo');
+                v.srcObject = e.streams[0]; v.style.display = 'block';
+                setStat("Streaming Live");
+            };
+        }
+
         async function startSupport() {
             const id = document.getElementById('code').value;
             if(!id) return alert("Enter Code");
-            pc.ontrack = e => { 
-                const v = document.getElementById('remoteVideo');
-                v.srcObject = e.streams[0]; v.style.display='block'; 
-            };
+            setStat("Waiting for connection...");
+            initPC();
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
-            db.ref('sessions/'+id).set({ offer });
-            db.ref('sessions/'+id+'/answer').on('value', async s => { 
-                if(s.val() && !pc.currentRemoteDescription) await pc.setRemoteDescription(new RTCSessionDescription(s.val())); 
+            db.ref('sessions/' + id).set({ offer });
+            db.ref('sessions/' + id + '/answer').on('value', async s => {
+                if (s.val() && !pc.currentRemoteDescription) await pc.setRemoteDescription(new RTCSessionDescription(s.val()));
             });
         }
 
         async function joinSupport() {
             const id = document.getElementById('code').value;
             if(!id) return alert("Enter Code");
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-                return alert("ERROR: Your mobile browser blocks Screen Sharing. Use a Laptop to share screen.");
-            }
+            initPC();
+            let stream;
             try {
-                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-                stream.getTracks().forEach(t => pc.addTrack(t, stream));
-                const snap = await db.ref('sessions/'+id+'/offer').once('value');
-                await pc.setRemoteDescription(new RTCSessionDescription(snap.val()));
-                const answer = await pc.createAnswer();
-                await pc.setLocalDescription(answer);
-                db.ref('sessions/'+id).update({ answer });
-            } catch(e) { alert("Permission Denied."); }
+                stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+            } catch (e) {
+                setStat("Mobile Mode: Sharing Camera");
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            }
+            stream.getTracks().forEach(t => pc.addTrack(t, stream));
+            const snap = await db.ref('sessions/' + id + '/offer').once('value');
+            if (!snap.val()) return alert("Viewer not ready. Click 'View' on the other device first.");
+            await pc.setRemoteDescription(new RTCSessionDescription(snap.val()));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            db.ref('sessions/' + id).update({ answer });
         }
     </script>
 </body>
